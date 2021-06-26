@@ -1,0 +1,2 @@
+Flask==1.1.2
+# our only requirements within the app is to use the latest version of flask for easy app creation.

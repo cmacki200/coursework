@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+</style>
+<title>Collections Page</title>
+</head>
+<body>
+    <h1>  Here is some dogs </h1>
+<div class="row">
+    <div class="column">
+        <figure>
+            <img src= '{{user_image1}}' alt="Sasha">
+        <figcaption>Dogs Collection: Sasha</figcaption>
+        </figure>
+    </div>
+    <div class="column">
+        <figure>
+            <img src= '{{user_image2}}' width = 200 height = 200 alt="Molly">
+        <figcaption>Dogs Collection: Molly</figcaption>
+        </figure>
+    </div>
+    <div class = "column">
+        <figure>
+            <img src= '{{user_image3}}' alt="Cassie">
+        <figcaption>Dogs Collection: Cassie</figcaption>
+        </figure>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+runtime: python37
+
+handlers:
+- url: /meta*
+  script: auto
+  

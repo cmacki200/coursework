@@ -1,0 +1,4 @@
+Flask==1.1.2
+requests==2.24.0
+#flask required for app creation
+#requests handled GET requests and allow retrieval of URL metadata, storing and displaying of the data
