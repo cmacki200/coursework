@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS for simple styling -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="simple.css">
+    <title>HealthCare BlockChain</title>
+  </head>
+  <body>
+    <h1>Welcome User</h1>
+
+    <h2>View and Amend Patient Data:</h2>
+    <form id="contract-form">
+      <div class="form-group">
+        <label for="Sender Address">Sender ETH Address</label>
+        <input value="" type="text" class="form-control" id="fromAddress" aria-describedby="fromAddressHelp" placeholder="Enter your address" required="true">
+        <small id="fromAddressHelp" class="form-text text-muted">Enter your wallet address. Note: you will need to approve this with your private key.</small>
+      </div>
+          <div class="form-group">
+            <label for="Name">Patient Name</label>
+            <input class="form-control" id="name" aria-describedby="nameHelp" placeholder="name of Patient" required="false">
+            <small id="nameHelp" class="form-text text-muted">The name of the patient you wish to change</small>
+            <label for="Age">Patient Age</label>
+            <input type="number" class="form-control" id="age" aria-describedby="ageHelp" placeholder="age of Patient" required="false">
+            <small id="ageHelp" class="form-text text-muted">The age of the patient you wish to change</small>
+            <label for="Gender">Patient Gender</label>
+            <input class="form-control" id="gender" aria-describedby="genderHelp" placeholder="gender of Patient" required="false">
+            <small id="genderHelp" class="form-text text-muted">The gender of the patient you wish to change (M/F)</small>
+          </div>
+      <button type="submit" class="btn btn-primary">Amend</button>
+      <div id="log_details">Click the amend button.</div>
+    </form>
+    <hr>
+    <h2>Patient 1:</h2>
+    <form id="patient-form">
+      <button type="submit" class="btn btn-primary">Get Patient Data</button>
+      <div id="get-details">Click Button to get the current patient details.</div>
+    </form>
+
+    <!--JavaScript section-->
+    <!-- import JS libaries; jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- link to smart contract ABI for integration into blockchain -->
+    <script src="web3/healthABI.js"></script>
+    <!-- library required to run web3 methods -->
+    <script src="web3/web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script>
+
+    var contractAddress = "0x4510f8b0845943bc4bE75B922013A5F5E4206320";
+    //ganache CLI test
+    if ( typeof web3 !== 'undefined' ) {
+      web3 = new Web3(web3.currentProvider);
+    }
+    else
+    { // set the provider you want from Web3.providers
+      web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+      //truffle localhost
+      //web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"));
+    }
+    var version = web3.version;
+    console.log("Web3 version " + version);
+
+    //get default account for blockchain
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+    //connection to blockchain network. requires healthABI and address to connect to blockchain network
+    var healthcare = new web3.eth.Contract(abi, contractAddress);
+    console.log(healthcare)
+
+    $('#contract-form').submit(function(){
+      event.preventDefault();
+      //get inputs from form input
+      var fromAddress = $('#fromAddress').val();
+      var name = $('#name').val();
+      var age = $('#age').val();
+      var gender = $('#gender').val();
+
+      console.log(age);
+      console.log(name);
+      console.log(gender);
+      //validition exception handling
+      if(web3.utils.isAddress(fromAddress)!= true){
+        alert("you did not enter a valid address to view and amend patient data.");
+        return;
+      }
+      if(!isNaN(name)){
+        alert("please enter a valid name.");
+        return;
+      }
+      if (isNaN(age)){
+        alert("please enter a valid number");
+        return;
+      }
+      if(!isNaN(gender)){
+        alert("please enter a valid gender (M/F).");
+        return;
+      }
+    });
+
+      //link smart contract to Web3
+      $("#contract-form").submit(function() {
+      //access web3 account fufilling promise
+        web3.eth.getAccounts().then(function(accounts){
+          var account = accounts[0];
+        //web3.call()
+          return healthcare.methods.setPatient($('#name').val(), $('#age').val(),$('#gender').val()).send({from: account});
+        }).then(function(result)
+        {
+          //fufill promise
+          $('#log_details').html('Success!');
+          console.log($('#name').val());
+          console.log($('#age').val());
+          console.log($('#gender').val());
+        }).catch(function(error)
+        {
+          $('#log_details').html('Error!' + ' '+ error);
+          console.log($('#name').val());
+          console.log($('#age').val());
+          console.log($('#gender').val());
+        })
+      });
+      //call method - access smart contract method
+      $('#patient-form').submit(function() {
+      event.preventDefault();
+      healthcare.methods.getPatient().call().then(function(result, error) {
+        //fufill promise
+        if (error){
+          console.log('error: something has went wrong')
+        }
+        else
+        {
+        console.log(result);
+        //get input from method
+        $("#get-details").html("Patient Record: " + "Name of the patient :" +  result[0] + " " + "Age of the patient :"
+        + result[1] + " " + 'Gender of the patient :' + result[2])
+        }
+      });
+    });
+
+    </script>
+    </body>
+</html>
